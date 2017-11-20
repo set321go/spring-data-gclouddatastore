@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.springframework.data.gclouddatastore.repository;
+package org.springframework.data.gclouddatasource.testing;
+
+import org.springframework.data.gclouddatastore.repository.GcloudDatastoreRepository;
 
 import java.util.List;
 import java.util.Optional;

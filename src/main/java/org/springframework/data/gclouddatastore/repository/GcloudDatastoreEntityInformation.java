@@ -18,52 +18,51 @@ package org.springframework.data.gclouddatastore.repository;
 
 import java.lang.reflect.Field;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.repository.core.support.AbstractEntityInformation;
 
-public class GcloudDatastoreEntityInformation<T, ID>
-		extends AbstractEntityInformation<T, ID> {
+public class GcloudDatastoreEntityInformation<T, ID> extends AbstractEntityInformation<T, ID> {
+    private static final Logger LOG = LoggerFactory.getLogger(GcloudDatastoreEntityInformation.class);
+    private final Field field;
 
-	public GcloudDatastoreEntityInformation(Class<T> domainClass) {
+    public GcloudDatastoreEntityInformation(Class<T> domainClass) {
 		super(domainClass);
+		this.field = reflectField(domainClass);
 	}
 
-	@SuppressWarnings("unchecked")
+	private Field reflectField(Class<T> domainClass) {
+        LOG.info("domainClass = {}", domainClass);
+        Class<?> entityClass = domainClass;
+        while (entityClass != Object.class) {
+            for (Field field : entityClass.getDeclaredFields()) {
+                if (field.getAnnotation(Id.class) != null) {
+                    return field;
+                }
+            }
+            entityClass = entityClass.getSuperclass();
+        }
+
+        throw new IllegalStateException("id not found on the domain class or any of its superclasses (" + domainClass + ")");
+    }
+
+    @SuppressWarnings("unchecked")
 	@Override
 	public ID getId(T entity) {
-		Class<?> domainClass = getJavaType();
-		while (domainClass != Object.class) {
-			for (Field field : domainClass.getDeclaredFields()) {
-				if (field.getAnnotation(Id.class) != null) {
-					try {
-						return (ID) field.get(entity);
-					}
-					catch (IllegalArgumentException | IllegalAccessException e) {
-						BeanWrapper beanWrapper = PropertyAccessorFactory
-								.forBeanPropertyAccess(entity);
-						return (ID) beanWrapper.getPropertyValue(field.getName());
-					}
-				}
-			}
-			domainClass = domainClass.getSuperclass();
-		}
-		throw new IllegalStateException("id not found");
+        try {
+            return (ID) field.get(entity);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(entity);
+            return (ID) beanWrapper.getPropertyValue(field.getName());
+        }
 	}
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
 	@Override
 	public Class<ID> getIdType() {
-		Class<?> domainClass = getJavaType();
-		while (domainClass != Object.class) {
-			for (Field field : domainClass.getDeclaredFields()) {
-				if (field.getAnnotation(Id.class) != null) {
-					return (Class<ID>) field.getType();
-				}
-			}
-			domainClass = domainClass.getSuperclass();
-		}
-		throw new IllegalStateException("id not found");
+        return (Class<ID>) field.getType();
 	}
 }

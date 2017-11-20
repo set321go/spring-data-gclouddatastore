@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.gclouddatastore.repository;
+package org.springframework.data.gclouddatasource.testing;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -24,7 +24,7 @@ import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.StructuredQuery;
 import org.junit.Test;
 
-import org.springframework.data.gclouddatastore.repository.PersonRepository;
+import org.springframework.data.gclouddatasource.testing.PersonRepository;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
