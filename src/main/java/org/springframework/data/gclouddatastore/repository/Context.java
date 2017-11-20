@@ -28,12 +28,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class Context implements AutoCloseable {
 
-	private static ThreadLocal<Deque<PathElement>> localAncestorsStack = new ThreadLocal<Deque<PathElement>>() {
-		@Override
-		protected Deque<PathElement> initialValue() {
-			return new LinkedList<PathElement>();
-		}
-	};
+	private static ThreadLocal<Deque<PathElement>> localAncestorsStack = ThreadLocal.withInitial(LinkedList::new);
 
 	private int count;
 

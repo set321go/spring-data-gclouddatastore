@@ -35,9 +35,7 @@ import static org.junit.Assert.assertEquals;
 
 public class GcloudDatastoreQueryCreatorTests {
 
-	private GcloudDatastoreQueryCreator createCreator(Class<?> repositoryClass,
-			Method method, Object... values) {
-
+	private GcloudDatastoreQueryCreator createCreator(Class<?> repositoryClass, Method method, Object... values) {
 		QueryMethod queryMethod = new QueryMethod(method,
 				new DefaultRepositoryMetadata(repositoryClass),
 				new SpelAwareProxyProjectionFactory());
