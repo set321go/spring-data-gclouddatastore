@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -55,8 +56,7 @@ public class GcloudDatastoreRepositoryFactory extends RepositoryFactorySupport {
 	}
 
 	@Override
-	public <T, ID extends Serializable> EntityInformation<T, ID> getEntityInformation(
-			Class<T> domainClass) {
+	public <T, ID> EntityInformation<T, ID>  getEntityInformation(Class<T> domainClass) {
 
 		return new GcloudDatastoreEntityInformation<T, ID>(domainClass);
 	}
@@ -66,7 +66,7 @@ public class GcloudDatastoreRepositoryFactory extends RepositoryFactorySupport {
 		return SimpleGcloudDatastoreRepository.class;
 	}
 
-	@Override
+    @Override
 	protected Object getTargetRepository(RepositoryInformation information) {
 		EntityInformation<?, Serializable> entityInformation = getEntityInformation(
 				information.getDomainType());
@@ -75,10 +75,10 @@ public class GcloudDatastoreRepositoryFactory extends RepositoryFactorySupport {
 	}
 
 	@Override
-	protected QueryLookupStrategy getQueryLookupStrategy(Key key,
-			EvaluationContextProvider evaluationContextProvider) {
+	protected Optional<QueryLookupStrategy> getQueryLookupStrategy(Key key,
+                                                                   EvaluationContextProvider evaluationContextProvider) {
 
-		return new QueryLookupStrategy() {
+		return Optional.of(new QueryLookupStrategy() {
 			@Override
 			public RepositoryQuery resolveQuery(Method method,
 					RepositoryMetadata metadata, ProjectionFactory factory,
@@ -175,6 +175,6 @@ public class GcloudDatastoreRepositoryFactory extends RepositoryFactorySupport {
 					}
 				};
 			}
-		};
+		});
 	}
 }

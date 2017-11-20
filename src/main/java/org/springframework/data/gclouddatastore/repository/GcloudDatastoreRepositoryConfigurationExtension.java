@@ -21,13 +21,13 @@ import org.springframework.data.repository.config.RepositoryConfigurationExtensi
 public class GcloudDatastoreRepositoryConfigurationExtension
 		extends RepositoryConfigurationExtensionSupport {
 
-	@Override
-	public String getRepositoryFactoryClassName() {
-		return GcloudDatastoreRepositoryFactory.class.getName();
-	}
+    @Override
+    public String getRepositoryFactoryBeanClassName() {
+        return GcloudDatastoreRepositoryFactory.class.getName();
+    }
 
-	@Override
-	protected String getModulePrefix() {
-		return "gcloudds";
-	}
+    @Override
+    protected String getModulePrefix() {
+        return "gcloudds";
+    }
 }

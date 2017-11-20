@@ -23,6 +23,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
@@ -40,6 +41,7 @@ import com.google.cloud.datastore.StructuredQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.util.Assert;
 
@@ -81,18 +83,18 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable>
 		return count;
 	}
 
-	@Override
-	public void delete(ID id) {
+    @Override
+	public void deleteById(ID id) {
 		deleteKeys(Arrays.asList(getKey(id)));
 	}
 
 	@Override
 	public void delete(T entity) {
-		delete(Arrays.asList(entity));
+		deleteAll(Arrays.asList(entity));
 	}
 
-	@Override
-	public void delete(Iterable<? extends T> entities) {
+    @Override
+	public void deleteAll(Iterable<? extends T> entities) {
 		deleteKeys(new Iterable<Key>() {
 			@Override
 			public Iterator<Key> iterator() {
@@ -127,8 +129,8 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable>
 	}
 
 	@Override
-	public boolean exists(ID id) {
-		return findOne(id) != null;
+	public boolean existsById(ID id) {
+		return findById(id).isPresent();
 	}
 
 	@Override
@@ -171,8 +173,8 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable>
 		return query(query);
 	}
 
-	@Override
-	public Iterable<T> findAll(Iterable<ID> ids) {
+    @Override
+	public Iterable<T> findAllById(Iterable<ID> ids) {
 		return new Iterable<T>() {
 			@Override
 			public Iterator<T> iterator() {
@@ -185,7 +187,12 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable>
 
 					@Override
 					public T next() {
-						return findOne(idIter.next());
+                        Optional<T> optionalNext = findById(idIter.next());
+                        if (optionalNext.isPresent()) {
+                            return optionalNext.get();
+                        } else {
+                            throw new IllegalStateException("Optional was empty, should handle this correctly");
+                        }
 					}
 				};
 			}
@@ -193,27 +200,27 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable>
 	}
 
 	@Override
-	public T findOne(ID id) {
+	public Optional<T> findById(ID id) {
 		Datastore datastore = this.datastoreOptions.getService();
 		Entity entity = datastore.get(getKey(id));
 		if (entity == null) {
-			return null;
+			return Optional.empty();
 		}
 		else {
-			return this.unmarshaller.unmarshal(entity,
-					this.entityInformation.getJavaType());
+			return Optional.of(this.unmarshaller.unmarshal(entity,
+					this.entityInformation.getJavaType()));
 		}
 
 	}
 
 	@Override
 	public <S extends T> S save(S entity) {
-		save(Arrays.asList(entity));
+		saveAll(Arrays.asList(entity));
 		return entity;
 	}
 
-	@Override
-	public <S extends T> Iterable<S> save(Iterable<S> entities) {
+    @Override
+	public <S extends T> Iterable<S> saveAll(Iterable<S> entities) {
 		Datastore datastore = this.datastoreOptions.getService();
 
 		List<FullEntity<? extends IncompleteKey>> buffer = new ArrayList<>();

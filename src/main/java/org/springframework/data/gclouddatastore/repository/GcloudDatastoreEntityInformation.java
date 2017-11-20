@@ -16,7 +16,6 @@
 
 package org.springframework.data.gclouddatastore.repository;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 
 import org.springframework.beans.BeanWrapper;
@@ -24,7 +23,7 @@ import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.repository.core.support.AbstractEntityInformation;
 
-public class GcloudDatastoreEntityInformation<T, ID extends Serializable>
+public class GcloudDatastoreEntityInformation<T, ID>
 		extends AbstractEntityInformation<T, ID> {
 
 	public GcloudDatastoreEntityInformation(Class<T> domainClass) {

@@ -58,7 +58,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise, Verify
 			assertEquals(2L, this.repo.count());
@@ -70,10 +70,10 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise
-			this.repo.delete(123L);
+			this.repo.deleteById(123L);
 
 			// Verify
 			assertThat(this.repo.findAll(), contains(new Person(456)));
@@ -85,7 +85,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise
 			this.repo.delete(new Person(123));
@@ -100,11 +100,11 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(
+			this.repo.saveAll(
 					Arrays.asList(new Person(123), new Person(456), new Person(789)));
 
 			// Exercise
-			this.repo.delete(Arrays.asList(new Person(123), new Person(789)));
+			this.repo.deleteAll(Arrays.asList(new Person(123), new Person(789)));
 
 			// Verify
 			assertThat(this.repo.findAll(), contains(new Person(456)));
@@ -116,7 +116,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise
 			this.repo.deleteAll();
@@ -134,7 +134,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 			this.repo.save(new Person(123));
 
 			// Exercise, Verify
-			assertEquals(true, this.repo.exists(123L));
+			assertEquals(true, this.repo.existsById(123L));
 		}
 	}
 
@@ -146,7 +146,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 			this.repo.save(new Person(123));
 
 			// Exercise, Verify
-			assertEquals(false, this.repo.exists(456L));
+			assertEquals(false, this.repo.existsById(456L));
 		}
 	}
 
@@ -166,7 +166,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise, Verify
 			assertThat(this.repo.findAll(), contains(new Person(123), new Person(456)));
@@ -178,10 +178,10 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise, Verify
-			assertThat(this.repo.findAll(Arrays.asList(123L)), contains(new Person(123)));
+			assertThat(this.repo.findAllById(Arrays.asList(123L)), contains(new Person(123)));
 		}
 	}
 
@@ -190,10 +190,10 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise, Verify
-			assertThat(this.repo.findAll(Arrays.asList(123L, 456L)),
+			assertThat(this.repo.findAllById(Arrays.asList(123L, 456L)),
 					contains(new Person(123), new Person(456)));
 		}
 	}
@@ -203,10 +203,10 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise, Verify
-			assertEquals(null, this.repo.findOne(789L));
+			assertEquals(null, this.repo.findById(789L));
 		}
 	}
 
@@ -215,10 +215,10 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise, Verify
-			assertEquals(new Person(123), this.repo.findOne(123L));
+			assertEquals(new Person(123), this.repo.findById(123L));
 		}
 	}
 
@@ -232,7 +232,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 			this.repo.save(new Person(123));
 
 			// Verify
-			assertEquals(new Person(123), this.repo.findOne(123L));
+			assertEquals(new Person(123), this.repo.findById(123L));
 		}
 	}
 
@@ -243,10 +243,10 @@ public class SimpleGcloudDatastoreRepositoryTests {
 			this.repo.deleteAll();
 
 			// Exercise
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Verify
-			assertThat(this.repo.findAll(Arrays.asList(123L, 456L)),
+			assertThat(this.repo.findAllById(Arrays.asList(123L, 456L)),
 					contains(new Person(123), new Person(456)));
 		}
 	}
@@ -256,7 +256,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise, Verify
 			assertEquals(new Person(456), this.repo.findById(456L));
@@ -268,7 +268,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(new Person(123), new Person(456)));
+			this.repo.saveAll(Arrays.asList(new Person(123), new Person(456)));
 
 			// Exercise, Verify
 			assertEquals(new Person(123), this.repo.findFirstById(123L).get());
@@ -280,7 +280,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(
+			this.repo.saveAll(Arrays.asList(
 					new Person(123L, "", "John", "Doe", 0, false),
 					new Person(456L, "", "Jane", "Doe", 0, false)));
 
@@ -296,7 +296,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(
+			this.repo.saveAll(Arrays.asList(
 					new Person(123L, "", "John", "Lennon", 0, false),
 					new Person(456L, "", "John", "Mayer", 0, false)));
 
@@ -312,7 +312,7 @@ public class SimpleGcloudDatastoreRepositoryTests {
 		try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
 			// Setup
 			this.repo.deleteAll();
-			this.repo.save(Arrays.asList(
+			this.repo.saveAll(Arrays.asList(
 					new Person(1L, "", "Fela", "Kuti", 0, false),
 					new Person(2L, "", "Tony", "Allen", 0, false),
 					new Person(3L, "", "Seun", "Kuti", 0, false),
