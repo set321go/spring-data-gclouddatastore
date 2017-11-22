@@ -38,9 +38,14 @@ import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.gclouddatastore.GcloudDatastoreRepository;
 import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.util.Assert;
@@ -281,4 +286,46 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable> impleme
 			return keyFactory.newKey(id.toString());
 		}
 	}
+
+    @Override
+    public Iterable<T> findAll(Sort sort) {
+        Assert.notNull(sort, "Sort cannot be null");
+
+        EntityQuery.Builder queryBuilder = Query.newEntityQueryBuilder()
+            .setKind(this.kind);
+        setAncestorFilter().ifPresent(queryBuilder::setFilter);
+
+        addOrderBy(sort, queryBuilder);
+
+        return query(queryBuilder.build());
+    }
+
+    @Override
+    public Page<T> findAll(Pageable pageable) {
+        Assert.notNull(pageable, "pageable cannot be null");
+
+        EntityQuery.Builder queryBuilder = Query.newEntityQueryBuilder()
+            .setKind(this.kind);
+        setAncestorFilter().ifPresent(queryBuilder::setFilter);
+        queryBuilder.setLimit(pageable.getPageSize())
+                    .setOffset(pageable.getPageNumber());
+
+        addOrderBy(pageable.getSort(), queryBuilder);
+
+        //FIXME this is sub optimal but we only have an interator so we need to consume it to get the size
+        //FIXME this does not create a true representation of the total number of results.
+        List<T> results = Lists.newArrayList(query(queryBuilder.build()));
+        return new PageImpl<>(results, pageable, results.size());
+    }
+
+    private void addOrderBy(Sort sort, EntityQuery.Builder queryBuilder) {
+        sort.forEach(order -> {
+            if (order.isAscending()) {
+                queryBuilder.addOrderBy(StructuredQuery.OrderBy.asc(order.getProperty()));
+            } else if (order.isDescending()){
+                queryBuilder.addOrderBy(StructuredQuery.OrderBy.desc(order.getProperty()));
+            }
+
+        });
+    }
 }

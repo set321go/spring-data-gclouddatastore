@@ -22,9 +22,10 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Query;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface GcloudDatastoreRepository<T, ID extends Serializable>
-		extends CrudRepository<T, ID> {
+		extends PagingAndSortingRepository<T, ID> {
 
 	Iterable<T> query(Query<Entity> query);
 }

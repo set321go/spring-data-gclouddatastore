@@ -17,6 +17,7 @@
 package org.springframework.data.gclouddatastore.repository;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 import com.google.cloud.datastore.PathElement;
@@ -24,6 +25,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.gclouddatasource.testing.Person;
 import org.springframework.data.gclouddatasource.testing.PersonRepository;
 import org.springframework.test.context.ContextConfiguration;
@@ -171,6 +175,46 @@ public class SimpleGcloudDatastoreRepositoryTests {
 			assertThat(this.repo.findAll(), contains(new Person(123), new Person(456)));
 		}
 	}
+
+    @Test
+    public void testFindAllSort() throws Exception {
+        try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
+            // Setup
+            this.repo.deleteAll();
+            this.repo.saveAll(Arrays.asList(
+                new Person(1L, "", "Fela", "Kuti", 0, false),
+                new Person(2L, "", "Tony", "Allen", 0, false),
+                new Person(3L, "", "Seun", "Kuti", 0, false),
+                new Person(4L, "", "Femi", "Kuti", 0, false)));
+
+            // Exercise, Verify
+            Iterator<Person> results = this.repo.findAll(Sort.by("firstName").ascending()).iterator();
+            assertEquals(results.next(), new Person(1L, "", "Fela", "Kuti", 0, false));
+            assertEquals(results.next(), new Person(4L, "", "Femi", "Kuti", 0, false));
+            assertEquals(results.next(), new Person(3L, "", "Seun", "Kuti", 0, false));
+            assertEquals(results.next(), new Person(2L, "", "Tony", "Allen", 0, false));
+        }
+    }
+
+    @Test
+    public void testFindPage() throws Exception {
+        try (Context ctx = Context.with(PathElement.of("Kind", 1))) {
+            // Setup
+            this.repo.deleteAll();
+            this.repo.saveAll(Arrays.asList(
+                new Person(1L, "", "Fela", "Kuti", 0, false),
+                new Person(2L, "", "Tony", "Allen", 0, false),
+                new Person(3L, "", "Seun", "Kuti", 0, false),
+                new Person(4L, "", "Femi", "Kuti", 0, false)));
+
+            // Exercise, Verify
+            Page<Person> results = this.repo.findAll(PageRequest.of(0, 2));
+            assertEquals(results.getNumberOfElements(), 2);
+            Iterator<Person> pageResults = results.iterator();
+            assertEquals(pageResults.next(), new Person(1L, "", "Fela", "Kuti", 0, false));
+            assertEquals(pageResults.next(), new Person(2L, "", "Tony", "Allen", 0, false));
+        }
+    }
 
 	@Test
 	public void testFindAllIds1() throws Exception {

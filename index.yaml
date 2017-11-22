@@ -5,3 +5,14 @@ indexes:
   properties:
   - name: lastName
   - name: firstName
+
+- kind: Person
+  ancestor: yes
+  properties:
+  - name: firstName
+
+- kind: Person
+  ancestor: yes
+  properties:
+  - name: firstName
+    direction: desc
