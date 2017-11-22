@@ -85,6 +85,28 @@ public class UnmarshallerTests {
 		ZonedDateTime zonedDateTime;
 	}
 
+    @Data
+    @NoArgsConstructor
+    public static class TestNullValueBean {
+        @Id
+        long id;
+        Object object;
+    }
+
+    @Test
+    public void testUnmarshalToNull() {
+        // Setup
+        Key key = Key.newBuilder("project", "kind", 1).build();
+        Entity entity = Entity.newBuilder(key).setNull("object").build();
+        TestBean bean = new TestBean();
+
+        // Exercise
+        Unmarshaller.unmarshalToObject(entity, bean);
+
+        // Verify
+        Assert.assertNull(bean.object);
+    }
+
 	@Test
 	public void testUnmarshalToObject_Blob() {
 		// Setup
@@ -93,11 +115,11 @@ public class UnmarshallerTests {
 		Entity entity = Entity.newBuilder(key).set("object", Blob.copyFrom(hello))
 				.set("bytes", Blob.copyFrom(hello)).set("string", Blob.copyFrom(hello))
 				.build();
-		Unmarshaller unmarshaller = new Unmarshaller();
+
 		TestBean bean = new TestBean();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Assert.assertArrayEquals(hello, (byte[]) bean.object);
@@ -111,11 +133,11 @@ public class UnmarshallerTests {
 		Key key = Key.newBuilder("project", "kind", 1).build();
 		Entity entity = Entity.newBuilder(key).set("object", true)
 				.set("boxedBoolean", true).set("primitiveBoolean", true).build();
-		Unmarshaller unmarshaller = new Unmarshaller();
+
 		TestBean bean = new TestBean();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Assert.assertEquals(Boolean.TRUE, bean.object);
@@ -134,11 +156,11 @@ public class UnmarshallerTests {
 				.set("boxedInteger", 3.14).set("primitiveInt", 3.14)
 				.set("boxedShort", 3.14).set("primitiveShort", 3.14)
 				.set("boxedByte", 3.14).set("primitiveByte", 3.14).build();
-		Unmarshaller unmarshaller = new Unmarshaller();
+
 		TestBean bean = new TestBean();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Assert.assertEquals(Double.valueOf(3.14), bean.object);
@@ -166,11 +188,10 @@ public class UnmarshallerTests {
 				.set("primitiveByte", 42).set("boxedDouble", 42)
 				.set("primitiveDouble", 42).set("boxedFloat", 42)
 				.set("primitiveFloat", 42).build();
-		Unmarshaller unmarshaller = new Unmarshaller();
 		TestBean bean = new TestBean();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Assert.assertEquals(Long.valueOf(42), bean.object);
@@ -200,11 +221,10 @@ public class UnmarshallerTests {
 				.set("primitiveByte", "42").set("boxedDouble", "3.14")
 				.set("primitiveDouble", "3.14").set("boxedFloat", "3.14")
 				.set("primitiveFloat", "3.14").set("uri", "https://example.com").build();
-		Unmarshaller unmarshaller = new Unmarshaller();
 		TestBean bean = new TestBean();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Assert.assertEquals("hello", bean.object);
@@ -239,12 +259,11 @@ public class UnmarshallerTests {
 				.set("linkedList", Arrays.asList(DoubleValue.of(3.14), LongValue.of(42),
 						StringValue.of("hello")))
 				.build();
-		Unmarshaller unmarshaller = new Unmarshaller();
 		TestBean bean = new TestBean();
 		bean.linkedList = new LinkedList<Object>();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Assert.assertThat((List<?>) bean.object, contains(3.14, 42L, "hello"));
@@ -260,11 +279,10 @@ public class UnmarshallerTests {
 		Entity entity = Entity.newBuilder(key)
 				.set("object", Entity.newBuilder().set("k", "v").build())
 				.set("map", Entity.newBuilder().set("k", "v").build()).build();
-		Unmarshaller unmarshaller = new Unmarshaller();
 		TestBean bean = new TestBean();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Map<String, Object> expected = new HashMap<>();
@@ -283,11 +301,10 @@ public class UnmarshallerTests {
 				.set("map", Entity.newBuilder()
 						.set("k1", Entity.newBuilder().set("k2", "v2").build()).build())
 				.build();
-		Unmarshaller unmarshaller = new Unmarshaller();
 		TestBean bean = new TestBean();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Map<String, Object> innerMap = new HashMap<>();
@@ -313,11 +330,10 @@ public class UnmarshallerTests {
 				.set("offsetDateTime", Timestamp.parseTimestamp("2017-07-09T12:34:56Z"))
 				.set("zonedDateTime", Timestamp.parseTimestamp("2017-07-09T12:34:56Z"))
 				.build();
-		Unmarshaller unmarshaller = new Unmarshaller();
 		TestBean bean = new TestBean();
 
 		// Exercise
-		unmarshaller.unmarshalToObject(entity, bean);
+		Unmarshaller.unmarshalToObject(entity, bean);
 
 		// Verify
 		Assert.assertEquals(OffsetDateTime.parse("2017-07-09T12:34:56Z").toInstant(),

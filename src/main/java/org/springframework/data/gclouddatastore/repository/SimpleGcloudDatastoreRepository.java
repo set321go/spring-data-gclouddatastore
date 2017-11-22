@@ -50,8 +50,6 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable> impleme
 	private static final int BUFFER_SIZE = 50;
 
 	private final DatastoreOptions datastoreOptions;
-	private final Marshaller marshaller;
-	private final Unmarshaller unmarshaller;
 	private final EntityInformation<T, ID> entityInformation;
 	private final String kind;
 
@@ -62,8 +60,6 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable> impleme
 		this.entityInformation = entityInformation;
 		this.kind = entityInformation.getJavaType().getSimpleName();
 		this.datastoreOptions = datastoreOptions;
-		this.marshaller = new Marshaller();
-		this.unmarshaller = new Unmarshaller();
 	}
 
 	@Override
@@ -134,7 +130,7 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable> impleme
                         public T next() {
                                 try {
                                         T entity = entityInformation.getJavaType().newInstance();
-                                        unmarshaller.unmarshalToObject(results.next(), entity);
+                                        Unmarshaller.unmarshalToObject(results.next(), entity);
                                         return entity;
                                 }
                                 catch (InstantiationException | IllegalAccessException e) {
@@ -188,8 +184,7 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable> impleme
 			return Optional.empty();
 		}
 		else {
-			return Optional.of(this.unmarshaller.unmarshal(entity,
-					this.entityInformation.getJavaType()));
+			return Optional.of(Unmarshaller.unmarshal(entity, entityInformation.getJavaType()));
 		}
 
 	}
@@ -211,7 +206,7 @@ public class SimpleGcloudDatastoreRepository<T, ID extends Serializable> impleme
 			ID id = this.entityInformation.getId(entity);
 			Key key = getKey(id);
 
-			buffer.add(this.marshaller.toEntity(entity, key));
+			buffer.add(Marshaller.toEntity(entity, key));
 			if (buffer.size() >= BUFFER_SIZE) {
 				datastore.put(buffer.toArray(new FullEntity[buffer.size()]));
 				buffer.clear();

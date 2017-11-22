@@ -46,9 +46,9 @@ import com.google.cloud.datastore.Value;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 
-public class Marshaller {
+class Marshaller {
 
-	private Value<?> toDatastoreValue(Object value) {
+	private static Value<?> toDatastoreValue(Object value) {
 		if (value == null) {
 			return NullValue.of();
 		}
@@ -56,19 +56,19 @@ public class Marshaller {
 			return StringValue.of(value.toString());
 		}
 		else if (value instanceof Boolean) {
-			return BooleanValue.of(((Boolean) value).booleanValue());
+			return BooleanValue.of((Boolean) value);
 		}
 		else if (value instanceof Float) {
 			return DoubleValue.of(((Float) value).doubleValue());
 		}
 		else if (value instanceof Double) {
-			return DoubleValue.of(((Double) value).doubleValue());
+			return DoubleValue.of((Double) value);
 		}
 		else if (value instanceof Integer) {
 			return LongValue.of(((Integer) value).longValue());
 		}
 		else if (value instanceof Long) {
-			return LongValue.of(((Long) value).longValue());
+			return LongValue.of((Long) value);
 		}
 		else if (value instanceof byte[]) {
 			return BlobValue.of(Blob.copyFrom((byte[]) value));
@@ -76,12 +76,12 @@ public class Marshaller {
 		else if (value instanceof ByteBuffer) {
 			return BlobValue.of(Blob.copyFrom((ByteBuffer) value));
 		}
-		else if (value instanceof Date) {
-			return TimestampValue.of(Timestamp.of((Date) value));
-		}
-		else if (value instanceof java.sql.Timestamp) {
-			return TimestampValue.of(Timestamp.of((java.sql.Timestamp) value));
-		}
+        else if (value instanceof java.sql.Timestamp) {
+            return TimestampValue.of(Timestamp.of((java.sql.Timestamp) value));
+        }
+        else if (value instanceof Date) {
+            return TimestampValue.of(Timestamp.of((Date) value));
+        }
 		else if (value instanceof com.google.protobuf.Timestamp) {
 			return TimestampValue
 					.of(Timestamp.fromProto((com.google.protobuf.Timestamp) value));
@@ -112,7 +112,7 @@ public class Marshaller {
 	}
 
 	@SuppressWarnings("unchecked")
-	public FullEntity<? extends IncompleteKey> toEntity(Object object, Key key) {
+	static FullEntity<? extends IncompleteKey> toEntity(Object object, Key key) {
 		FullEntity.Builder<? extends IncompleteKey> builder;
 		if (key == null) {
 			builder = Entity.newBuilder();
@@ -122,27 +122,29 @@ public class Marshaller {
 		}
 
 		if (object instanceof Map) {
-			for (Map.Entry<String, Object> entry : ((Map<String, Object>) object)
-					.entrySet()) {
-				setEntityValue(builder, entry.getKey(), entry.getValue());
+			for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) object).entrySet()) {
+                if (entry.getKey() instanceof String) {
+                    setEntityValue(builder, (String) entry.getKey(), entry.getValue());
+                } else {
+                    throw new MarshallingFailureException("Cannot marshall maps with non string keys");
+                }
 			}
 		}
 		else {
-			BeanWrapper beanWrapper = PropertyAccessorFactory
-					.forBeanPropertyAccess(object);
-			for (PropertyDescriptor propertyDescriptor : beanWrapper
-					.getPropertyDescriptors()) {
+			BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(object);
+			for (PropertyDescriptor propertyDescriptor : beanWrapper.getPropertyDescriptors()) {
 				String name = propertyDescriptor.getName();
-				if ("class".equals(name))
-					continue;
+				if ("class".equals(name)) {
+                    continue;
+                }
+
 				setEntityValue(builder, name, beanWrapper.getPropertyValue(name));
 			}
 		}
 		return builder.build();
 	}
 
-	private void setEntityValue(FullEntity.Builder<? extends IncompleteKey> builder,
-			String name, Object value) {
-		builder.set(name, toDatastoreValue(value));
+	private static void setEntityValue(FullEntity.Builder<? extends IncompleteKey> builder, String key, Object value) {
+        builder.set((String) key, toDatastoreValue(value));
 	}
 }

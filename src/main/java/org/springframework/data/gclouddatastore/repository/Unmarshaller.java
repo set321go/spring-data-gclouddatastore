@@ -46,15 +46,13 @@ import org.springframework.beans.PropertyAccessorFactory;
 
 public class Unmarshaller {
 
-	public <K extends IncompleteKey> Object unmarshal(
-			FullEntity<? extends IncompleteKey> entity) {
+	private static Object unmarshal(FullEntity<? extends IncompleteKey> entity) {
 		Map<String, Object> newMap = new HashMap<>();
 		unmarshalToMap(entity, newMap);
 		return newMap;
 	}
 
-	public <K extends IncompleteKey, T> T unmarshal(
-			FullEntity<? extends IncompleteKey> entity, Class<T> clazz) {
+	static <T> T unmarshal(FullEntity<? extends IncompleteKey> entity, Class<T> clazz) {
 		try {
 			T obj = clazz.newInstance();
 			unmarshalToObject(entity, obj);
@@ -65,12 +63,16 @@ public class Unmarshaller {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> T unmarshal(Value<?> value, Class<T> clazz) {
-		return (T) unmarshal(value);
+	private static <T> T unmarshal(Value<?> value, Class<T> clazz) {
+        Object unmarshal = unmarshal(value);
+        if (clazz.isInstance(unmarshal)) {
+            return clazz.cast(unmarshal);
+        } else {
+            throw new ClassCastException("Value is not of type (" + clazz + ")");
+        }
 	}
 
-	public Object unmarshal(Value<?> value) {
+	private static Object unmarshal(Value<?> value) {
 		ValueType valueType = value.getType();
 		switch (valueType) {
 		case BLOB:
@@ -85,7 +87,7 @@ public class Unmarshaller {
 			FullEntity<? extends IncompleteKey> entity = ((EntityValue) value).get();
 			return unmarshal(entity);
 		case KEY:
-			throw new UnsupportedOperationException(valueType.toString());
+			throw new UnsupportedOperationException("Cannot unmarshal key type: " + valueType.toString());
 		case LIST:
 			List<Object> newList = new ArrayList<>();
 			List<? extends Value<?>> list = ((ListValue) value).get();
@@ -100,11 +102,11 @@ public class Unmarshaller {
 		case TIMESTAMP:
 			return ((TimestampValue) value).get().toSqlTimestamp().toInstant();
 		default:
-			throw new RuntimeException("should never reach here");
+			throw new UnsupportedOperationException("No matching type found for: " + valueType.toString());
 		}
 	}
 
-	public <K extends IncompleteKey> void unmarshalToMap(FullEntity<K> entity,
+	private static <K extends IncompleteKey> void unmarshalToMap(FullEntity<K> entity,
 			Map<String, Object> map) {
 
 		for (String name : entity.getNames()) {
@@ -141,8 +143,7 @@ public class Unmarshaller {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K extends IncompleteKey> void unmarshalToObject(FullEntity<K> entity,
-			Object object) {
+	public static <K extends IncompleteKey> void unmarshalToObject(FullEntity<K> entity, Object object) {
 
 		if (object instanceof Map) {
 			unmarshalToMap(entity, (Map<String, Object>) object);
@@ -350,9 +351,7 @@ public class Unmarshaller {
 						}
 					}
 					newList.clear();
-					for (Object newValue : unmarshal(value, List.class)) {
-						newList.add(newValue);
-					}
+                    newList.addAll(unmarshal(value, List.class));
 				}
 				break;
 			case NULL:
