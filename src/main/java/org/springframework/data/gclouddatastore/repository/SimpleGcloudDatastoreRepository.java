@@ -41,6 +41,7 @@ import com.google.cloud.datastore.StructuredQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.data.gclouddatastore.GcloudDatastoreRepository;
 import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.util.Assert;
 

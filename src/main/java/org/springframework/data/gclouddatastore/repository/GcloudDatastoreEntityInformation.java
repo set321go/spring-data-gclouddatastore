@@ -35,7 +35,7 @@ public class GcloudDatastoreEntityInformation<T, ID> extends AbstractEntityInfor
 	}
 
 	private Field reflectField(Class<T> domainClass) {
-        LOG.info("domainClass = {}", domainClass);
+        LOG.debug("Looking for @Id in: {}", domainClass);
         Class<?> entityClass = domainClass;
         while (entityClass != Object.class) {
             for (Field field : entityClass.getDeclaredFields()) {

@@ -23,26 +23,29 @@ import com.google.cloud.datastore.DatastoreOptions;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
+import org.springframework.util.Assert;
 
 public class GcloudDatastoreRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
 		extends RepositoryFactoryBeanSupport<T, S, ID> {
 
-	DatastoreOptions datastoreOptions;
+	private DatastoreOptions datastoreOptions;
 
 	public GcloudDatastoreRepositoryFactoryBean(Class<? extends T> repositoryInterface) {
 		super(repositoryInterface);
-		this.datastoreOptions = DatastoreOptions.getDefaultInstance();
-	}
-
-	public GcloudDatastoreRepositoryFactoryBean(
-			Class<? extends T> repositoryInterface,
-			DatastoreOptions datastoreOptions) {
-		super(repositoryInterface);
-		this.datastoreOptions = datastoreOptions;
 	}
 
 	@Override
 	protected RepositoryFactorySupport createRepositoryFactory() {
-		return new GcloudDatastoreRepositoryFactory(this.datastoreOptions);
+		return new GcloudDatastoreRepositoryFactory(datastoreOptions);
 	}
+
+    public void setDatastoreOptions(DatastoreOptions datastoreOptions) {
+        this.datastoreOptions = datastoreOptions;
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        Assert.notNull(datastoreOptions, "you must provide DatastoreOptions it cannot be null!");
+        super.afterPropertiesSet();
+    }
 }

@@ -16,7 +16,7 @@
 
 package org.springframework.data.gclouddatasource.testing;
 
-import org.springframework.data.gclouddatastore.repository.GcloudDatastoreRepository;
+import org.springframework.data.gclouddatastore.GcloudDatastoreRepository;
 
 import java.util.List;
 import java.util.Optional;

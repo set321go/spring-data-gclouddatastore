@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.data.gclouddatastore.repository;
+package org.springframework.data.gclouddatastore.repository.config;
 
 import java.lang.annotation.Annotation;
 
 import org.springframework.data.repository.config.RepositoryBeanDefinitionRegistrarSupport;
 import org.springframework.data.repository.config.RepositoryConfigurationExtension;
 
-public class GcloudDatastoreRepositoriesRegistrar
-		extends RepositoryBeanDefinitionRegistrarSupport {
+public class GcloudDatastoreRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
 
 	@Override
 	protected Class<? extends Annotation> getAnnotation() {

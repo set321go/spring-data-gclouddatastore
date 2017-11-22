@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package org.springframework.data.gclouddatastore.repository;
+package org.springframework.data.gclouddatastore;
 
-import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
+import java.io.Serializable;
 
-public class GcloudDatastoreRepositoryConfigurationExtension
-		extends RepositoryConfigurationExtensionSupport {
+import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.Query;
 
-    @Override
-    public String getRepositoryFactoryBeanClassName() {
-        return GcloudDatastoreRepositoryFactory.class.getName();
-    }
+import org.springframework.data.repository.CrudRepository;
 
-    @Override
-    protected String getModulePrefix() {
-        return "gcloudds";
-    }
+public interface GcloudDatastoreRepository<T, ID extends Serializable>
+		extends CrudRepository<T, ID> {
+
+	Iterable<T> query(Query<Entity> query);
 }

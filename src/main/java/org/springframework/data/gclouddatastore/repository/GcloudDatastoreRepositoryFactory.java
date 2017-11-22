@@ -42,6 +42,7 @@ public class GcloudDatastoreRepositoryFactory extends RepositoryFactorySupport {
 
 	private DatastoreOptions datastoreOptions;
 
+	//FIXME this does not get injected Not sure why
 	public GcloudDatastoreRepositoryFactory(DatastoreOptions datastoreOptions) {
         Assert.notNull(datastoreOptions, "Data Store Options must not be null");
         this.datastoreOptions = datastoreOptions;
