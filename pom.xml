@@ -48,9 +48,8 @@
 
     <distributionManagement>
         <repository>
-            <id>bintray-tkob-maven</id>
-            <name>tkob-maven</name>
-            <url>https://api.bintray.com/maven/tkob/maven/spring-data-gclouddatastore/;publish=1</url>
+            <id>libs-snapshot-local</id>
+            <url>https://repo.data-realm.com/artifactory/libs-snapshot-local</url>
         </repository>
     </distributionManagement>
 </project>
